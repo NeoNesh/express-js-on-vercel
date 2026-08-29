@@ -3,22 +3,20 @@ import crypto from 'node:crypto';
 import express from 'express';
 import AdmZip from 'adm-zip';
 
-const chunks = [
-  'payload/00.txt',
-  'payload/01.txt',
-  'bundle/02.txt',
-  'payload/03.txt',
-  'payload/04.txt',
-  'payload/05.txt',
-  'bundle/90-110.txt',
-  'bundle/110-130.txt',
-  'bundle/130-150.txt',
-  'bundle/150-end.txt'
-];
-
 const expectedLength = 158508;
 const expectedSha256 = '7839031a2519c16484ee02380ffef076d31f5425c161e4c898ca3426dd7a9598';
-const encoded = chunks.map((file) => fs.readFileSync(new URL(file, import.meta.url), 'utf8').trim()).join('');
+const encoded = [
+  fs.readFileSync(new URL('./payload/00.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./payload/01.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./bundle/02.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./payload/03.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./payload/04.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./payload/05.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./bundle/90-110.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./bundle/110-130.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./bundle/130-150.txt', import.meta.url), 'utf8').trim(),
+  fs.readFileSync(new URL('./bundle/150-end.txt', import.meta.url), 'utf8').trim()
+].join('');
 if (encoded.length !== expectedLength) throw new Error(`EduQuest bundle length mismatch: ${encoded.length}`);
 
 const archive = Buffer.from(encoded, 'base64');
@@ -78,7 +76,7 @@ app.use((req, res) => {
   }
   const body = files.get(key);
   const type = types[extname(key)] || 'application/octet-stream';
-  res.type(type);
+  res.set('Content-Type', type);
   if (key.startsWith('assets/')) res.set('Cache-Control', 'public, max-age=31536000, immutable');
   else res.set('Cache-Control', 'no-cache');
   res.send(body);

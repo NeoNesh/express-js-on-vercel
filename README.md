@@ -1,31 +1,18 @@
-# Express.js on Vercel
+# EduQuest Production v7
 
-Basic Express.js + Vercel example that serves html content, JSON data and simulates an api route.
+Public Vercel build of EduQuest for grades 1–4.
 
-## How to Use
+- Kid-first login: nickname, grade and avatar; no password is required on the current device.
+- Russian, Uzbek and English interfaces.
+- Learning hub, story missions, mini-games, coding, English, technology and room progression.
+- Works without a database in device mode; progress is stored in the browser on that device.
+- Cloud sync and staff tools can be connected later through Supabase; they are not required for this public static deployment.
 
-You can choose from one of the following two methods to use this repository:
-
-### One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/examples/tree/main/solutions/express&project-name=express&repository-name=express)
-
-### Clone and Deploy
+## Build
 
 ```bash
-git clone https://github.com/vercel/examples/tree/main/solutions/express
+npm install
+npm run build
 ```
 
-Install the Vercel CLI:
-
-```bash
-npm i -g vercel
-```
-
-Then run the app at the root of the repository:
-
-```bash
-vercel dev
-```
+Vercel uses `vercel.json` and serves the generated `dist/` directory.

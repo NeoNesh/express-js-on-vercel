@@ -1,18 +1,12 @@
-# EduQuest Production v7
+# EduQuest v7
 
-Public Vercel build of EduQuest for grades 1–4.
+Production deployment for the EduQuest learning platform.
 
-- Kid-first login: nickname, grade and avatar; no password is required on the current device.
-- Russian, Uzbek and English interfaces.
-- Learning hub, story missions, mini-games, coding, English, technology and room progression.
-- Works without a database in device mode; progress is stored in the browser on that device.
-- Cloud sync and staff tools can be connected later through Supabase; they are not required for this public static deployment.
+- Grades 1–4
+- Russian / Uzbek / English
+- Password-free child profile creation
+- Device-local progress when no cloud database is configured
+- Daily learning missions and mini-games
+- Vercel Express runtime
 
-## Build
-
-```bash
-npm install
-npm run build
-```
-
-Vercel uses `vercel.json` and serves the generated `dist/` directory.
+The application bundle is checksum-verified at runtime before it is served. No Supabase configuration is required for this deployment mode.

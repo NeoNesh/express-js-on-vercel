@@ -1,15 +1,13 @@
 {
-  "name": "eduquest-production-v7-static",
+  "name": "eduquest-production-v7",
   "version": "7.0.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "build": "node build.mjs"
-  },
   "dependencies": {
-    "adm-zip": "^0.5.16"
+    "adm-zip": "^0.5.16",
+    "express": "^4.21.2"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   }
 }

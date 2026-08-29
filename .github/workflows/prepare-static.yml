@@ -1,0 +1,62 @@
+name: Prepare EduQuest static branch
+
+on:
+  push:
+    branches:
+      - eduquest-v7-deploy
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify EduQuest bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/eduquest-site
+          cat \
+            payload/00.txt \
+            payload/01.txt \
+            bundle/02.txt \
+            payload/03.txt \
+            payload/04.txt \
+            payload/05.txt \
+            bundle/90-110.txt \
+            bundle/110-130.txt \
+            bundle/130-150.txt \
+            bundle/150-end.txt \
+            | base64 -d > /tmp/eduquest-site.zip
+          echo "7839031a2519c16484ee02380ffef076d31f5425c161e4c898ca3426dd7a9598  /tmp/eduquest-site.zip" | sha256sum -c -
+          unzip -q /tmp/eduquest-site.zip -d /tmp/eduquest-site
+          test -f /tmp/eduquest-site/index.html
+          test -f /tmp/eduquest-site/login.html
+          test -f /tmp/eduquest-site/play.html
+          test -f /tmp/eduquest-site/assets/js/game.js
+
+      - name: Publish extracted static source branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --orphan eduquest-static-ready
+          git rm -rf . || true
+          cp -a /tmp/eduquest-site/. .
+          cat > vercel.json <<'JSON'
+          {
+            "$schema": "https://openapi.vercel.sh/vercel.json",
+            "cleanUrls": true,
+            "trailingSlash": false
+          }
+          JSON
+          printf 'node_modules/\n.vercel/\n.env*\n' > .gitignore
+          git add -A
+          git commit -m "Build EduQuest v7 static production source"
+          git push --force origin HEAD:eduquest-static-ready

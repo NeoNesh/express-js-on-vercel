@@ -60,12 +60,30 @@ function resolvePath(urlPath) {
   return null;
 }
 
+const AUTHOR_CREDIT = `
+<style id="eq-author-style">
+  .eq-author-credit{position:fixed;right:14px;bottom:12px;z-index:9997;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid rgba(255,255,255,.10);border-radius:999px;background:rgba(7,17,31,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 28px rgba(0,0,0,.16);color:rgba(233,243,255,.72);font:600 11px/1.15 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.02em;user-select:none;pointer-events:none}
+  .eq-author-credit::before{content:"";width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#70e1ff,#7c6dff);box-shadow:0 0 12px rgba(112,225,255,.45)}
+  .eq-author-credit strong{color:#fff;font-weight:800}
+  @media (max-width:720px){.eq-author-credit{right:8px;bottom:8px;padding:6px 9px;font-size:10px;opacity:.88}}
+  @media print{.eq-author-credit{display:none!important}}
+</style>
+<div class="eq-author-credit" aria-label="Author">by <strong>Dilafruz Sodiqova</strong></div>`;
+
+function decorateHtml(buffer) {
+  let html = buffer.toString('utf8');
+  if (html.includes('Dilafruz Sodiqova')) return Buffer.from(html, 'utf8');
+  if (html.includes('</body>')) html = html.replace('</body>', `${AUTHOR_CREDIT}\n</body>`);
+  else html += AUTHOR_CREDIT;
+  return Buffer.from(html, 'utf8');
+}
+
 const app = express();
 app.disable('x-powered-by');
 
 app.get('/healthz', (_req, res) => {
   res.set('Cache-Control', 'no-store');
-  res.json({ ok: true, app: 'EduQuest', version: '7.0.0', files: files.size, sha256: digest });
+  res.json({ ok: true, app: 'EduQuest', version: '7.0.1', files: files.size, sha256: digest, author: 'Dilafruz Sodiqova' });
 });
 
 app.use((req, res) => {
@@ -74,8 +92,9 @@ app.use((req, res) => {
     res.status(404).type('text/plain').send('Not found');
     return;
   }
-  const body = files.get(key);
+  const original = files.get(key);
   const type = types[extname(key)] || 'application/octet-stream';
+  const body = extname(key) === '.html' ? decorateHtml(original) : original;
   res.set('Content-Type', type);
   if (key.startsWith('assets/')) res.set('Cache-Control', 'public, max-age=31536000, immutable');
   else res.set('Cache-Control', 'no-cache');
